@@ -1,3 +1,6 @@
+// ...
+
+import { useState } from "react";
 import { Route, Routes, useNavigate } from "react-router-dom";
 import "./App.css";
 import {
@@ -37,12 +40,28 @@ const Layout = ({ children }) => {
 function App() {
   const { accessToken, loading } = useSelector((state) => state.auth);
   const navigate = useNavigate();
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
     if (!loading && !accessToken) {
       navigate("/login");
+    } else if (!loading && accessToken) {
+      setIsLoggedIn(true);
+      navigate("/");
     }
   }, [accessToken, loading, navigate]);
+
+  const handleLogin = (username, password) => {
+    // Your login logic here
+    // Example: Check if username and password are valid
+    if (username === "admin" && password === "password") {
+      setIsLoggedIn(true);
+      notifyMsg("success", "Login successful");
+      navigate("/");
+    } else {
+      notifyMsg("error", "Invalid username or password");
+    }
+  };
 
   return (
     <div className="App">
@@ -87,7 +106,17 @@ function App() {
           }
         />
 
-        <Route exact path="/login" element={<Login notifyMsg={notifyMsg} />} />
+        <Route
+          exact
+          path="/login"
+          element={
+            <Login
+              notifyMsg={notifyMsg}
+              isLoggedIn={isLoggedIn}
+              handleLogin={handleLogin}
+            />
+          }
+        />
 
         <Route exact path="*" element={<NotFound />} />
       </Routes>
